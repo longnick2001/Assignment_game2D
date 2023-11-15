@@ -5,10 +5,15 @@ using System.Security.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 
 public class Player : MonoBehaviour
 {
+    private bool isLeft, isRight, isTop;
+    private float horizontalMove;
+    
+    public Button top;
     public AudioSource loseLife;
     public AudioSource death;
     public AudioSource nextLevel;
@@ -102,6 +107,7 @@ public class Player : MonoBehaviour
         jump();
         playerName();
         Heart();
+        MovePlayer();
     }
 
     void Heart()
@@ -129,7 +135,8 @@ public class Player : MonoBehaviour
             }
         }
     }
-    
+
+
 
     void jump()
     {
@@ -352,5 +359,76 @@ public class Player : MonoBehaviour
             score += 10; 
             txtScore.text = "Score: " + score;
         }
+    }
+    
+    public void Top()
+    {
+        if (grounded)
+        {
+            audioJump.Play();
+            anim.SetFloat("idle", 0);
+            anim.SetTrigger("jump");
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+            jumpCount++;
+        }else if (jumpCount < 2)
+        {
+            audioJump.Play();
+            anim.SetTrigger("doublejump");
+            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+            jumpCount++;
+        }
+    }
+    
+    public void PoiterDownLeft()
+    {
+        if (facingRight)
+        {
+            flip();
+        }
+        anim.SetFloat("run", 1);
+        isLeft = true;
+    }
+    
+    public void PoiterUpLeft()
+    {
+        anim.SetFloat("run", 0);
+        isLeft = false;
+    }
+    
+    public void PoiterDownRight()
+    {
+        if(!facingRight)
+        {
+            flip();
+        }
+        anim.SetFloat("run", 1);
+        isRight = true;
+    }
+    
+    public void PoiterUpRight()
+    {
+        anim.SetFloat("run", 0);
+        isRight = false;
+    }
+
+    private void MovePlayer()
+    {
+        if (isLeft)
+        {
+            horizontalMove = -speed;
+        }
+        else if(isRight)
+        {
+            horizontalMove = speed;
+        }
+        else
+        {
+            horizontalMove = 0;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.velocity = new Vector2(horizontalMove, rb.velocity.y);
     }
 }
